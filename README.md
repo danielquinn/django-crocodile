@@ -7,7 +7,7 @@ If you're looking for a simple way to aggregate all of your various style sheets
 
 This is what you probably have on your site.  If you don't, then you probably don't need an aggregator:
 
-``` django
+``` xml
     {% block css %}
       <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}appname/css/somefile.css" />
       <link rel="stylesheet" type="text/css" media="screen" href="{{ MEDIA_URL }}path/to/something/else.css" />
@@ -33,7 +33,7 @@ This isn't ideal, since you're left with multiple server hits, sometimes to remo
 
 Crocodile is setup with a simple template tag:
 
-``` django
+``` xml
     {% aggregate_css %}
       {% block css %}
         <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}appname/css/somefile.css" />
@@ -61,13 +61,15 @@ Crocodile is setup with a simple template tag:
 
 And the output looks something like this:
 
+``` xml
     <script src="YOUR_MEDIA_URL/path/to/cached/file.js?release=YOUR_RELEASE_TAG" />
+```
 
 The contents of `file.css` and `file.js` are the combined payloads of every file listed between the `{% aggregate_* %} and {% endaggregate_* %}` tags.  This will even include remote files and literal blocks if you put them in there.
 
 It's entirely possible that you may not want all of these files to be loaded at once, as in cases where you may want to force the remote loading of come files.  To do that, you just keep those definitions out of the aggregate block:
 
-``` django
+``` xml
     {% aggregate_css %}
       {% block css %}
         <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}appname/css/somefile.css" />
@@ -91,7 +93,9 @@ Everything outside of the aggregation block is left alone.
 
 To install it into your project, just use `pip`:
 
-    pip install git+git://github.com/danielquinn/django-crocodile.git
+``` bash
+    $ pip install git+git://github.com/danielquinn/django-crocodile.git
+```
 
 Once you've got it, you'll need to add it to your `INSTALLED_APPS` in your `settings.py` file.  Note as crocodile won't automatically run when `DEBUG` is set to `True`, you can force it to run by setting `ENABLE_AGGREGATION = True` in your `settings.py` file.
 
