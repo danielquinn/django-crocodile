@@ -7,6 +7,7 @@ If you're looking for a simple way to aggregate all of your various style sheets
 
 This is what you probably have on your site.  If you don't, then you probably don't need an aggregator:
 
+``` django
     {% block css %}
       <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}appname/css/somefile.css" />
       <link rel="stylesheet" type="text/css" media="screen" href="{{ MEDIA_URL }}path/to/something/else.css" />
@@ -26,11 +27,13 @@ This is what you probably have on your site.  If you don't, then you probably do
         alert("Keep being awesome!");
       </script>
     {% endblock js %}
+```
 
 This isn't ideal, since you're left with multiple server hits, sometimes to remote servers.  In some of the more complex setups, your site could have 10 or even 20 CSS and/or JS files.  What's more, you probably have `{% block css %}` and `{% block js %}` subclassed elsewhere on your site, so this list of files is variable.
 
 Crocodile is setup with a simple template tag:
 
+``` django
     {% aggregate_css %}
       {% block css %}
         <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}appname/css/somefile.css" />
@@ -54,6 +57,7 @@ Crocodile is setup with a simple template tag:
         </script>
       {% endblock js %}
     {% endaggregate_js %}
+```
 
 And the output looks something like this:
 
@@ -63,6 +67,7 @@ The contents of `file.css` and `file.js` are the combined payloads of every file
 
 It's entirely possible that you may not want all of these files to be loaded at once, as in cases where you may want to force the remote loading of come files.  To do that, you just keep those definitions out of the aggregate block:
 
+``` django
     {% aggregate_css %}
       {% block css %}
         <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}appname/css/somefile.css" />
@@ -78,6 +83,7 @@ It's entirely possible that you may not want all of these files to be loaded at 
     {% block remote_css %}
       <link rel="stylesheet" type="text/css" media="screen" href="https://www.somedomain.ca/path/to/remote/file.css" />
     {% endblock remote_css %}
+```
 
 Everything outside of the aggregation block is left alone.
 
