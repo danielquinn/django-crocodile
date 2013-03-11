@@ -81,6 +81,17 @@ It's entirely possible that you may not want all of these files to be loaded at 
 
 Everything outside of the aggregation block is left alone.
 
+## Setup & installation
+
+To install it into your project, just use `pip`:
+
+    pip install git+git://github.com/danielquinn/django-crocodile.git
+
+Once you've got it, you'll need to add it to your `INSTALLED_APPS` in your `settings.py` file.  Note as crocodile won't automatically run when `DEBUG` is set to `True`, you can force it to run by setting `ENABLE_AGGREGATION = True` in your `settings.py` file.
+
+That's it, now go about wrapping your markup and see what happens!
+
+
 ## TODO
 
 * Medium-aware CSS is still sketchy.  Basically it currently grabs all CSS files that aren't set to `media="print"` and dumps them into the aggregated `.css` file.  If you have a printable .css file, it's best to keep it out of your aggregation block for this reason.
