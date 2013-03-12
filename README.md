@@ -97,9 +97,16 @@ To install it into your project, just use `pip`:
     $ pip install git+git://github.com/danielquinn/django-crocodile.git
 ```
 
-Once you've got it, you'll need to add it to your `INSTALLED_APPS` in your `settings.py` file.  Note as crocodile won't automatically run when `DEBUG` is set to `True`, you can force it to run by setting `ENABLE_AGGREGATION = True` in your `settings.py` file.
+Once you've got it, you'll need to add it to your `INSTALLED_APPS` in your
+`settings.py` file.  Some additional values you might want to tinker with are:
 
-That's it, now go about wrapping your markup and see what happens!
+* `CROCODILE_ENABLE`
+** If this is set to True, aggregation will occur even when `DEBUG = True`.
+* `CROCODILE_ENABLE_COMPRESSION`
+** CSS compression is enabled by default.  Setting this value to `False` will
+   disable it.
+
+And that's it, now go about wrapping your markup and see what happens!
 
 
 ## TODO
