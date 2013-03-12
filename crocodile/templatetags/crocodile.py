@@ -15,7 +15,7 @@ register = template.Library()
 def aggregate_js(parser, token):
     """
     """
-    nodelist = parser.parse(('aggregate_js',))
+    nodelist = parser.parse(('endaggregate_js',))
     parser.delete_first_token()
 
     return JavascriptNode(nodelist)
@@ -26,7 +26,7 @@ def aggregate_js(parser, token):
 def aggregate_css(parser, token):
     """
     """
-    nodelist = parser.parse(('aggregate_css',))
+    nodelist = parser.parse(('endaggregate_css',))
     parser.delete_first_token()
 
     return CSSNode(nodelist)
