@@ -43,6 +43,7 @@ setup(
     package_dir={app_name: app_name},
     packages=packages,
     package_data={app_name: data_files},
+    requires=["cssmin",],
     classifiers=[
         'Development Status :: 5 - Production/Unstable',
         'Environment :: Web Environment',

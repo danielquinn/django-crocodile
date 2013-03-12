@@ -5,6 +5,7 @@ from hashlib import md5
 from urllib import quote
 from urllib2 import urlopen, urlparse
 
+from cssmin import cssmin
 from django import template
 from django.conf import settings
 from django.contrib.staticfiles.finders import FileSystemFinder, AppDirectoriesFinder
@@ -62,12 +63,14 @@ class StaticfileNode(template.Node):
             "cache",
             self.type,
             "%s.%s" % (
-                md5(settings.RELEASE + source_markup).hexdigest(),
+                md5(
+                    getattr(settings, "RELEASE", "") + source_markup
+                ).hexdigest(),
                 self.type
             )
         )
 
-        if settings.DEBUG or not os.path.exists(cache_filename):
+        if not os.path.exists(cache_filename):
 
             output = self._compile(context)
             output = self._compress(output)
@@ -198,7 +201,7 @@ class CSSNode(StaticfileNode):
 
 
     def _compress(self, uncompressed):
-        return uncompressed
+        return cssmin(uncompressed)
 
 
     def _markup(self, file_contents):
