@@ -101,10 +101,10 @@ Once you've got it, you'll need to add it to your `INSTALLED_APPS` in your
 `settings.py` file.  Some additional values you might want to tinker with are:
 
 * `CROCODILE_ENABLE`
-** If this is set to True, aggregation will occur even when `DEBUG = True`.
+  * If this is set to `True`, aggregation will occur even when `DEBUG = True`.
 * `CROCODILE_ENABLE_COMPRESSION`
-** CSS compression is enabled by default.  Setting this value to `False` will
-   disable it.
+  * CSS compression is enabled by default.  Setting this value to `False`
+    will disable it.
 
 And that's it, now go about wrapping your markup and see what happens!
 
