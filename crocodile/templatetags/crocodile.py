@@ -43,17 +43,12 @@ class StaticfileNode(template.Node):
         self.nodelist = nodelist
 
 
-    def _detect_enabled(self):
-
-        if hasattr(settings, "ENABLE_AGGREGATION"):
-            return settings.ENABLE_AGGREGATION
-        else:
-            return not settings.DEBUG
-
-
     def render(self, context):
 
         source_markup = self.nodelist.render(context)
+
+        if not source_markup:
+            return ""
 
         if not self._detect_enabled():
             return source_markup
@@ -88,6 +83,14 @@ class StaticfileNode(template.Node):
         ))
 
 
+    def _detect_enabled(self):
+
+        if hasattr(settings, "CROCODILE_ENABLE"):
+            return settings.CROCODILE_ENABLE
+        else:
+            return not settings.DEBUG
+
+
     def _getfile (self, filename):
 
         r = FileSystemFinder().find(filename)
@@ -120,7 +123,7 @@ class StaticfileNode(template.Node):
 
 
     def _fetch_url(self, url):
-        return ""
+        return urlopen(url).read().decode("utf-8")
 
 
 
@@ -148,6 +151,9 @@ class JavascriptNode(StaticfileNode):
 
 
     def _compress(self, uncompressed):
+        """
+        We don't have compression yet.
+        """
         return uncompressed
 
 
@@ -201,7 +207,9 @@ class CSSNode(StaticfileNode):
 
 
     def _compress(self, uncompressed):
-        return cssmin(uncompressed)
+        if getattr(settings, "CROCODILE_ENABLE_COMPRESSION", True):
+            return cssmin(uncompressed)
+        return uncompressed
 
 
     def _markup(self, file_contents):
