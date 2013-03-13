@@ -63,8 +63,6 @@ class StaticfileNode(template.Node):
 
     __metaclass__ = ABCMeta
 
-    _errors = []
-
     def __init__(self, nodelist):
         self.type = ""
         self.nodelist = nodelist
@@ -77,7 +75,7 @@ class StaticfileNode(template.Node):
         if not source_markup:
             return ""
 
-        if self._errors or not self._detect_enabled():
+        if not self._detect_enabled():
             return source_markup
 
         cache_filename = os.path.join(
