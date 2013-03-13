@@ -1,20 +1,34 @@
-import os, re
+import logging, os, re, urllib2
 
 from abc import ABCMeta, abstractmethod
 from hashlib import md5
 from urllib import quote
-from urllib2 import urlopen, urlparse
 
 from cssmin import cssmin
 from django import template
 from django.conf import settings
 from django.contrib.staticfiles.finders import FileSystemFinder, AppDirectoriesFinder
 
+from ..import __version__
+
 register = template.Library()
 
 @register.tag
 def aggregate_js(parser, token):
     """
+    Sample:
+      {% aggregate_css %}
+        {% block css %}
+          <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}appname/css/somefile.css" />
+          <link rel="stylesheet" type="text/css" media="screen" href="{{ MEDIA_URL }}path/to/something/else.css" />
+          <link rel="stylesheet" type="text/css" media="screen" href="https://www.somedomain.ca/path/to/remote/file.css" />
+          <style>
+            .classname {
+              background-image: url("awesome.png");
+            }
+          </style>
+        {% endblock css %}
+      {% endaggregate_css %}
     """
     nodelist = parser.parse(('endaggregate_js',))
     parser.delete_first_token()
@@ -26,6 +40,17 @@ def aggregate_js(parser, token):
 @register.tag
 def aggregate_css(parser, token):
     """
+    Sample:
+      {% aggregate_js %}
+        {% block js %}
+          <script type="text/javascript" src="{{ STATIC_URL }}appname/js/somefile.js"></script>
+          <script type="text/javascript" src="{{ MEDIA_URL }}path/to/something/else.js"></script>
+          <script type="text/javascript" src="https://www.somedomain.ca/path/to/remote/file.js"></script>
+          <script>
+            alert("Keep being awesome!");
+          </script>
+        {% endblock js %}
+      {% endaggregate_js %}
     """
     nodelist = parser.parse(('endaggregate_css',))
     parser.delete_first_token()
@@ -37,6 +62,8 @@ def aggregate_css(parser, token):
 class StaticfileNode(template.Node):
 
     __metaclass__ = ABCMeta
+
+    _errors = []
 
     def __init__(self, nodelist):
         self.type = ""
@@ -50,7 +77,7 @@ class StaticfileNode(template.Node):
         if not source_markup:
             return ""
 
-        if not self._detect_enabled():
+        if self._errors or not self._detect_enabled():
             return source_markup
 
         cache_filename = os.path.join(
@@ -65,10 +92,14 @@ class StaticfileNode(template.Node):
             )
         )
 
-        if not os.path.exists(cache_filename):
+        if settings.DEBUG or not os.path.exists(cache_filename):
 
-            output = self._compile(context)
-            output = self._compress(output)
+            try:
+                output = self._compile(context)
+                output = self._compress(output)
+            except Exception as e:
+                logging.warn("[django-crocodile] Aggregation failure: %s" % e)
+                return source_markup
 
             try:
                 os.makedirs(os.path.dirname(cache_filename))
@@ -93,13 +124,13 @@ class StaticfileNode(template.Node):
 
     def _getfile (self, filename):
 
+        if filename.startswith("http") or filename.startswith("//"):
+            return self._fetch_url(filename)
+
         r = FileSystemFinder().find(filename)
 
         if not r:
             r = AppDirectoriesFinder().find(filename)
-
-        if not r and filename.startswith("http"):
-            return self._fetch_url(filename)
 
         if not r:
             return "<!-- FILE NOT FOUND: %s -->\n" % filename
@@ -123,7 +154,12 @@ class StaticfileNode(template.Node):
 
 
     def _fetch_url(self, url):
-        return urlopen(url).read().decode("utf-8")
+        request = urllib2.Request(
+            re.sub(r"^//(.*)", r"https://\1", url),
+            None,
+            {"User-Agent": "django-crocodile %s" % __version__}
+        )
+        return urllib2.urlopen(request).read().decode("utf-8")
 
 
 
@@ -226,7 +262,7 @@ class CSSNode(StaticfileNode):
         relative ones.
         """
 
-        url = urlparse.urlparse(url)
+        url = urllib2.urlparse.urlparse(url)
         return re.sub(
             self._fetch_regex,
             lambda m: "url('%s://%s%s')" % (
@@ -239,5 +275,5 @@ class CSSNode(StaticfileNode):
                     )
                 )
             ),
-            urlopen(url.geturl()).read().decode("utf-8")
+            super(CSSNode, self)._fetch_url(url.geturl())
         )
