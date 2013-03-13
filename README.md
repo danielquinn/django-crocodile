@@ -80,7 +80,7 @@ there.
 ## Exceptions
 
 It's entirely possible that you may not want all of these files to be loaded at
-once, as in cases where you may want to force the remote loading of come files.
+once, as in cases where you may want to force the remote loading of some files.
 To do that, you just keep those definitions out of the aggregate block:
 
 ``` xml
@@ -96,9 +96,9 @@ To do that, you just keep those definitions out of the aggregate block:
   {% endblock css %}
 {% endaggregate_css %}
 
-{% block remote_css %}
+{% block special_case_css %}
   <link rel="stylesheet" type="text/css" media="screen" href="https://www.somedomain.ca/path/to/remote/file.css" />
-{% endblock remote_css %}
+{% endblock special_case_css %}
 ```
 
 Everything outside of the aggregation block is left alone.
