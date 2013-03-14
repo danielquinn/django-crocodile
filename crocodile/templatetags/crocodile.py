@@ -2,7 +2,6 @@ import logging, os, re, urllib2
 
 from abc import ABCMeta, abstractmethod
 from hashlib import md5
-from urllib import quote
 
 from cssmin import cssmin
 from django import template
@@ -194,7 +193,7 @@ class JavascriptNode(StaticfileNode):
     def _markup(self, file_contents):
         return '<script language="javascript" src="%s?release=%s"></script>' % (
             file_contents,
-            quote(settings.RELEASE)
+            urllib2.quote(settings.RELEASE)
         )
 
 
@@ -249,7 +248,7 @@ class CSSNode(StaticfileNode):
     def _markup(self, file_contents):
         return '<link rel="stylesheet" href="%s?release=%s" type="text/css" />' % (
             file_contents,
-            quote(settings.RELEASE)
+            urllib2.quote(settings.RELEASE)
         )
 
 
