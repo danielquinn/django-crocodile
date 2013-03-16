@@ -105,7 +105,7 @@ To do that, you just keep those definitions out of the aggregate block:
 Everything outside of the aggregation block is left alone.
 
 
-## Setup & installation
+## Setup & Installation
 
 To install it into your project, just use `pip`:
 
