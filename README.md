@@ -47,7 +47,7 @@ Crocodile is setup with a simple template tag:
     <link rel="stylesheet" type="text/css" media="screen" href="https://www.somedomain.ca/path/to/remote/file.css" />
     <style>
       .classname {
-        background-image: url("awesome.png");
+        background-image: url("{{ STATIC_URL }}awesome.png");
       }
     </style>
   {% endblock css %}
@@ -91,7 +91,7 @@ To do that, you just keep those definitions out of the aggregate block:
     <link rel="stylesheet" type="text/css" media="screen" href="{{ MEDIA_URL }}path/to/something/else.css" />
     <style>
       .classname {
-        background-image: url("awesome.png");
+        background-image: url("{{ STATIC_URL }}awesome.png");
       }
     </style>
   {% endblock css %}
