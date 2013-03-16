@@ -16,7 +16,7 @@ don't need an aggregator:
   <link rel="stylesheet" type="text/css" media="screen" href="https://www.somedomain.ca/path/to/remote/file.css" />
   <style>
     .classname {
-      background-image: url("awesome.png");
+      background-image: url("{{ STATIC_URL }}awesome.png");
     }
   </style>
 {% endblock css %}
@@ -68,8 +68,8 @@ Crocodile is setup with a simple template tag:
 And the output looks something like this:
 
 ``` xml
-<script src="YOUR_MEDIA_URL/path/to/cached/file.js?release=YOUR_RELEASE_TAG" />
-<script src="YOUR_MEDIA_URL/path/to/cached/file.css?release=YOUR_RELEASE_TAG" />
+<script src="YOUR_MEDIA_URL/cache/js/md5-sum-of-markup.js?release=YOUR_RELEASE_TAG" />
+<script src="YOUR_MEDIA_URL/cache/css/md5-sum-of-markup.css?release=YOUR_RELEASE_TAG" />
 ```
 
 The contents of `file.css` and `file.js` are the combined payloads of every
@@ -77,7 +77,8 @@ file listed between the `{% aggregate_* %} and {% endaggregate_* %}` tags.
 This will even include remote files and literal blocks if you put them in
 there.
 
-## Exceptions
+
+## But What if I Don't Want to Aggregate Everything?
 
 It's entirely possible that you may not want all of these files to be loaded at
 once, as in cases where you may want to force the remote loading of some files.
@@ -96,9 +97,9 @@ To do that, you just keep those definitions out of the aggregate block:
   {% endblock css %}
 {% endaggregate_css %}
 
-{% block special_case_css %}
+{% block my_special_case_css %}
   <link rel="stylesheet" type="text/css" media="screen" href="https://www.somedomain.ca/path/to/remote/file.css" />
-{% endblock special_case_css %}
+{% endblock my_special_case_css %}
 ```
 
 Everything outside of the aggregation block is left alone.
@@ -115,6 +116,10 @@ $ pip install git+git://github.com/danielquinn/django-crocodile.git
 Once you've got it, you'll need to add it to your `INSTALLED_APPS` in your
 `settings.py` file.  Some additional values you might want to tinker with are:
 
+* `RELEASE`
+  * This is the release version of your project.  `django-crocodile` will
+    append this value in the form of `?release=RELEASE` so you don't have to
+    worry about users caching your old CSS values.
 * `CROCODILE_ENABLE`
   * If this is set to `True`, aggregation will occur even when `DEBUG = True`.
 * `CROCODILE_ENABLE_COMPRESSION`
@@ -126,13 +131,21 @@ And that's it, now go about wrapping your markup and see what happens!
 
 ## TODO
 
+* A management script to blow away the cache files.  Just to make things a
+  little cleaner than forcing you to run `rm /path/to/media/root/cache/{css,js}/*`
 * Medium-aware CSS is still sketchy.  Basically it currently grabs all CSS
   files that aren't set to `media="print"` and dumps them into the aggregated
   `.css` file.  If you have a printable .css file, it's best to keep it out of
   your aggregation block for this reason.
   * Other media types are just rolled into the aggregated file, so that may
     cause some headaches.
-* Exploder-specific CSS tags (`<!-- if IE lt 8>`) are also ignored.  Ew.
+* Exploder-specific CSS tags (`<!-- if IE lt 8>`) are also ignored.  *Ew*.
+
+
+## But Why "Crocodile"
+
+Because it's an *aggregator*, which is like *alligator*... get it?  Shut up,
+I'm hilarious.
 
 
 ## Disclaimers
