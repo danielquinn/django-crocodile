@@ -124,13 +124,21 @@ class StaticfileNode(template.Node):
         if filename.startswith("http") or filename.startswith("//"):
             return self._fetch_url(filename)
 
-        r = FileSystemFinder().find(filename)
+        return self._get_local_file(filename)
+
+
+    def _get_local_file(self, filename):
+
+        stripped_filename = filename.replace(settings.STATIC_URL, "").replace(settings.MEDIA_URL, "")
+
+        r = FileSystemFinder().find(stripped_filename)
 
         if not r:
-            r = AppDirectoriesFinder().find(filename)
+            r = AppDirectoriesFinder().find(stripped_filename)
 
         if not r:
-            return "<!-- FILE NOT FOUND: %s -->\n" % filename
+            logging.warn("[django-crocodile] File not found: %s" % filename)
+            return ""
 
         return open(r).read().decode("utf-8", "replace") + "\n"
 
@@ -151,6 +159,7 @@ class StaticfileNode(template.Node):
 
 
     def _fetch_url(self, url):
+
         request = urllib2.Request(
             re.sub(r"^//(.*)", r"https://\1", url),
             None,
@@ -176,7 +185,7 @@ class JavascriptNode(StaticfileNode):
             ignore = re.match(r"^.*</?script.*", line)              # Ignore the <script> tags when we're writing straight into the file
 
             if path:
-                js += self._getfile(path.group(1).replace(settings.STATIC_URL, ""))
+                js += self._getfile(path.group(1))
             elif not ignore:
                 js += line + "\n"
 
@@ -231,8 +240,7 @@ class CSSNode(StaticfileNode):
 
             if source:
                 if not re.search(r"media=('|\")?print('|\")?", line):
-                    source = source.group(1).replace(settings.STATIC_URL, "")
-                    css += self._getfile(source).replace("{{ STATIC_URL }}", settings.STATIC_URL)
+                    css += self._getfile(source.group(1))
             elif not ignore:
                 css += line + "\n"
 
@@ -273,4 +281,20 @@ class CSSNode(StaticfileNode):
                 )
             ),
             super(CSSNode, self)._fetch_url(url.geturl())
+        )
+
+
+    def _get_local_file(self, filename):
+
+        return re.sub(
+            self._fetch_regex,
+            lambda m: "url('%s')" % (
+                os.path.normpath(
+                    os.path.join(
+                        os.path.dirname(filename),
+                        m.group(1)
+                    )
+                )
+            ),
+            super(CSSNode, self)._get_local_file(filename)
         )
