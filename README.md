@@ -142,7 +142,7 @@ And that's it, now go about wrapping your markup and see what happens!
 * Exploder-specific CSS tags (`<!-- if IE lt 8>`) are also ignored.  *Ew*.
 
 
-## But Why "Crocodile"
+## But Why "Crocodile"?
 
 Because it's an *aggregator*, which is like *alligator*... get it?  Shut up,
 I'm hilarious.
