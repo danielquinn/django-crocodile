@@ -119,7 +119,7 @@ class StaticfileNode(template.Node):
             return not settings.DEBUG
 
 
-    def _getfile (self, filename):
+    def _getfile(self, filename):
 
         if filename.startswith("http") or filename.startswith("//"):
             return self._fetch_url(filename)
@@ -288,13 +288,22 @@ class CSSNode(StaticfileNode):
 
         return re.sub(
             self._fetch_regex,
-            lambda m: "url('%s')" % (
-                os.path.normpath(
-                    os.path.join(
-                        os.path.dirname(filename),
-                        m.group(1)
-                    )
-                )
-            ),
+            self._fix_remote_reference_in_local_file,
             super(CSSNode, self)._get_local_file(filename)
+        )
+
+
+    def _fix_remote_reference_in_local_file(self, match):
+
+        url = match.group(1)
+        if re.match(r"^https?://.*", url):
+            return "url('%s')" % url
+
+        return "url('%s')" % (
+            os.path.normpath(
+                os.path.join(
+                    os.path.dirname(filename),
+                    m.group(1)
+                )
+            )
         )
