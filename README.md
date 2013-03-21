@@ -110,7 +110,7 @@ Everything outside of the aggregation block is left alone.
 To install it into your project, just use `pip`:
 
 ``` bash
-$ pip install git+git://github.com/danielquinn/django-crocodile.git
+$ pip install git+git://github.com/danielquinn/django-crocodile.git#egg=django-crocodile
 ```
 
 Once you've got it, you'll need to add it to your `INSTALLED_APPS` in your
