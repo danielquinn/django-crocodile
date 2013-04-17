@@ -210,6 +210,7 @@ class JavascriptNode(StaticfileNode):
 class CSSNode(StaticfileNode):
 
     _fetch_regex = re.compile("url\(\"?'?(.*?)\"?'?\)")
+    _current_filename = None  # Hack to work around the passing of an additional argument to self._fix_remote_reference_in_local_file()
 
     def __init__(self, *a, **kwa):
         super(CSSNode, self).__init__(*a, **kwa)
@@ -286,6 +287,8 @@ class CSSNode(StaticfileNode):
 
     def _get_local_file(self, filename):
 
+        self._current_filename = filename
+
         return re.sub(
             self._fetch_regex,
             self._fix_remote_reference_in_local_file,
@@ -302,8 +305,8 @@ class CSSNode(StaticfileNode):
         return "url('%s')" % (
             os.path.normpath(
                 os.path.join(
-                    os.path.dirname(filename),
-                    m.group(1)
+                    os.path.dirname(self._current_filename),
+                    url
                 )
             )
         )
