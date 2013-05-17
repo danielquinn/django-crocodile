@@ -71,7 +71,7 @@ class StaticfileNode(template.Node):
 
         source_markup = self.nodelist.render(context)
 
-        if not source_markup:
+        if not source_markup.strip():
             return ""
 
         if not self._detect_enabled():
