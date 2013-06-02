@@ -107,7 +107,13 @@ Everything outside of the aggregation block is left alone.
 
 ## Setup & Installation
 
-To install it into your project, just use `pip`:
+To install it into your project, just use `pip`.  Either using pypi:
+
+``` bash
+$ pip install django-crocodile
+```
+
+Or you can grab the development version through GitHub:
 
 ``` bash
 $ pip install git+git://github.com/danielquinn/django-crocodile.git#egg=django-crocodile
